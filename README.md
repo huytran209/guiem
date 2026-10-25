@@ -1,11 +1,13 @@
-# Huy Tran & Thuỳ Linh — mobile refinement v2
+# Huy Tran & Thuỳ Linh — Mobile polish v3
 
-Bản cập nhật giao diện điện thoại: trình phát nhạc có 3 kích thước, đĩa vinyl cân giữa H ♡ L, timeline bài hát đồng bộ, icon SVG đồng nhất, giảm chồng chữ.
+## Nội dung cập nhật
+- Trình phát nhạc mặc định thu gọn còn hai nút: phát/tạm dừng và mở rộng.
+- Nút mở rộng chuyển giữa trạng thái gọn và đầy đủ (thông tin bài hát, âm lượng, trạng thái).
+- Thay biểu tượng trang trí dễ bị render thành emoji xanh bằng SVG/chi tiết nét mảnh đồng bộ tông nâu.
+- Căn giữa nhãn đĩa than, trình phát nhạc và các điều khiển ở màn hình nhỏ.
+- Tăng độ mượt của cuộn trang và hiệu ứng xuất hiện; tôn trọng `prefers-reduced-motion`.
 
-## GitHub Pages
-Tải toàn bộ nội dung trong thư mục này lên thư mục gốc của repository, giữ nguyên `index.html`, `style.css`, `script.js` và `assets/`. Chọn Settings → Pages → `main` → `/(root)`.
+## Đăng GitHub Pages
+Tải `index.html`, `style.css`, `script.js` và thư mục `assets` lên cùng thư mục gốc của nhánh `main`. Vào Settings → Pages, chọn `main` và `/ (root)`.
 
-## File độc lập
-`index-single-standalone.html` nhúng ảnh và âm thanh. Nếu dùng file này riêng, đổi tên thành `index.html` trước khi xuất bản.
-
-Lưu ý: trình duyệt iOS có thể chặn tự phát âm thanh có tiếng. Nếu vậy, nhấn nút phát trên trình phát.
+Trình duyệt có thể chặn tự phát âm thanh có tiếng; nếu vậy, nhấn nút phát.

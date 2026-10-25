@@ -66,6 +66,9 @@
   const currentTime = $('currentTime'), duration = $('duration'), audioStatus = $('audioStatus');
   const floatingPlay = $('floatingPlay'), floatingVolume = $('floatingVolume'), floatingMute = $('floatingMute'), floatingResize = $('floatingResize');
   const floatingVolumeValue = $('floatingVolumeValue'), floatingStatus = $('floatingStatus');
+  // Start in the compact two-button mode; the user can expand it at any time.
+  const floatingPlayer = $('floatingMusic');
+  floatingPlayer.classList.add('is-compact');
   audio.volume = Number(volume.value);
   let previousVolume = audio.volume || 0.75;
   function formatTime(seconds) {
@@ -99,15 +102,12 @@
   floatingPlay.addEventListener('click', toggleAudio);
   if (floatingResize) floatingResize.addEventListener('click', () => {
     const player = document.getElementById('floatingMusic');
-    const sizes = ['size-small', 'size-normal', 'size-large'];
-    const current = sizes.findIndex((name) => player.classList.contains(name));
-    sizes.forEach((name) => player.classList.remove(name));
-    player.classList.remove('is-compact');
-    const next = (current + 1) % sizes.length;
-    player.classList.add(sizes[next]);
-    const labels = ['Kích thước nhỏ; nhấn để đổi kích thước', 'Kích thước vừa; nhấn để đổi kích thước', 'Kích thước lớn; nhấn để đổi kích thước'];
-    floatingResize.setAttribute('aria-label', labels[next]);
-    floatingResize.title = labels[next];
+    const compact = player.classList.toggle('is-compact');
+    floatingResize.setAttribute('aria-label', compact ? 'Mở rộng trình phát nhạc' : 'Thu gọn trình phát nhạc');
+    floatingResize.title = compact ? 'Mở rộng trình phát nhạc' : 'Thu gọn trình phát nhạc';
+    floatingResize.innerHTML = compact
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M9 12h6M12 9v6"/></svg>';
   });
   audio.addEventListener('play', syncPlayState);
   audio.addEventListener('pause', syncPlayState);

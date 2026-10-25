@@ -182,3 +182,63 @@ html, body { max-width: 100%; overflow-x: clip; }
 @media (prefers-reduced-motion:reduce) { .floating-music { transition:none; } }
 .play-button { display:grid; place-items:center; }
 .play-button svg { width:20px; height:20px; display:block; fill:currentColor; }
+
+
+/* v3 polish: minimal compact controls, centered geometry, custom ornaments and smooth reveals */
+:root { scroll-behavior:smooth; }
+html { scroll-behavior:smooth; scroll-padding-top:96px; }
+body { -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+.floating-music { width:min(340px,calc(100vw - 24px)); transition:width .28s cubic-bezier(.2,.7,.2,1), padding .28s ease, border-radius .28s ease, box-shadow .28s ease; }
+.floating-music.is-compact { width:auto!important; max-width:calc(100vw - 16px); padding:7px; border-radius:999px; background:rgba(255,250,241,.97); }
+.floating-music.is-compact .floating-music-top { gap:7px; }
+.floating-music.is-compact .floating-kicker,
+.floating-music.is-compact .floating-track,
+.floating-music.is-compact .floating-artist,
+.floating-music.is-compact .floating-volume,
+.floating-music.is-compact .floating-status { display:none!important; }
+.floating-music.is-compact .floating-actions { gap:7px; }
+.floating-music.is-compact .floating-resize,
+.floating-music.is-compact .floating-play { width:40px; height:40px; flex:0 0 40px; }
+.floating-resize, .floating-play { display:grid; place-items:center; padding:8px; }
+.floating-resize svg { width:100%; height:100%; }
+.floating-actions { justify-content:center; align-items:center; }
+.floating-music:not(.is-compact) .floating-music-top { align-items:center; }
+.floating-music:not(.is-compact) .floating-track { max-width:100%; }
+/* Keep the vinyl label optically centered and prevent the H/heart/L row from drifting. */
+.vinyl-label { position:absolute!important; inset:31% auto auto 31%; width:38%!important; height:38%!important; padding:0; margin:0; display:flex!important; flex-direction:row!important; align-items:center!important; justify-content:center!important; gap:clamp(2px,.8vw,6px)!important; transform:none!important; text-align:center!important; overflow:hidden; }
+.vinyl-label > span { margin:0!important; padding:0; flex:0 1 auto!important; line-height:1!important; }
+.vinyl-label .vinyl-heart { font-size:.8em!important; }
+/* Replace platform-dependent emoji-looking ornaments with restrained custom line art. */
+.tiny-star { color:#a77d61; }
+.note-sparkle { display:grid; place-items:center; color:#a77d61; background:#fff8ee; border:1px solid #d9bfa5; border-radius:50%; width:38px; height:38px; box-shadow:0 3px 12px rgba(76,50,34,.10); }
+.note-sparkle svg { display:block; width:23px; height:23px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.photo-pin { background:#b98772!important; color:#fff8ec!important; }
+.photo-pin svg { fill:none!important; stroke:currentColor!important; stroke-width:1.6!important; }
+.section h2, .hero h1, .track-info h3, .random-note-card p, .letter-paper p, .final-message p { text-wrap:pretty; overflow-wrap:break-word; word-break:normal; }
+.section-copy { max-width:min(100%,560px); }
+@media(max-width:600px) {
+ .floating-music { top:max(8px,env(safe-area-inset-top)); right:8px; width:min(340px,calc(100vw - 16px)); max-width:calc(100vw - 16px); padding:10px 12px; }
+ .floating-music.is-compact { width:auto!important; padding:6px; }
+ .floating-music.is-compact .floating-resize,.floating-music.is-compact .floating-play { width:38px;height:38px;flex-basis:38px; }
+ .music-player { margin-inline:auto; }
+ .vinyl-area { display:grid; place-items:center; width:100%; }
+ .vinyl { margin-inline:auto; }
+ .track-info { width:100%; text-align:center; }
+ .track-info h3 { max-width:100%; margin-inline:auto; line-height:1.2; }
+ .progress-row { width:100%; }
+ .player-controls { justify-content:center!important; align-items:center; }
+ .volume-control { justify-content:center; }
+ .section { padding-top:clamp(64px,12vw,100px); padding-bottom:clamp(64px,12vw,100px); }
+ .section h2 { line-height:1.14; }
+ .section-copy { line-height:1.65; }
+}
+@media(prefers-reduced-motion:no-preference) {
+ .section.in-view > * { animation:softRise .65s cubic-bezier(.2,.7,.2,1) both; }
+ .section.in-view > *:nth-child(2) { animation-delay:.04s; }
+ .section.in-view > *:nth-child(3) { animation-delay:.08s; }
+ .section.in-view > *:nth-child(4) { animation-delay:.12s; }
+ .portrait-card, .letter-paper, .random-note-card, .final-message { transition:transform .35s ease, box-shadow .35s ease; }
+ .portrait-card:hover, .letter-paper:hover, .random-note-card:hover { box-shadow:0 18px 42px rgba(76,50,34,.13); }
+}
+@keyframes softRise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto!important; } .section.in-view > * { animation:none!important; } }

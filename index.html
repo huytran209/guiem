@@ -12,10 +12,10 @@
 <body>
   <div class="paper-grain" aria-hidden="true"></div>
   <aside class="floating-music" id="floatingMusic" aria-label="Trình phát nhạc" role="region">
-    <div class="floating-music-top"><span class="floating-kicker">OUR LITTLE SONG ♡</span><button type="button" id="floatingPlay" class="floating-play" aria-label="Phát nhạc">▶</button></div>
+    <div class="floating-music-top"><span class="floating-kicker">OUR LITTLE SONG <span class="icon-heart" aria-hidden="true">♡</span></span><div class="floating-actions"><button type="button" id="floatingResize" class="floating-resize" aria-label="Thu gọn trình phát" title="Thu gọn trình phát"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M9 12h6M12 9v6"/></svg></button><button type="button" id="floatingPlay" class="floating-play" aria-label="Phát nhạc"><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button></div></div>
     <div class="floating-track">Từ thích thích thành thương thương</div>
     <div class="floating-artist">AMEE &amp; Hoàng Dũng</div>
-    <div class="floating-volume"><button type="button" id="floatingMute" class="floating-mute" aria-label="Tắt tiếng" title="Tắt tiếng">♫</button><input id="floatingVolume" type="range" min="0" max="1" step="0.01" value="0.75" aria-label="Điều chỉnh âm lượng"><span id="floatingVolumeValue">75%</span></div>
+    <div class="floating-volume"><button type="button" id="floatingMute" class="floating-mute" aria-label="Tắt tiếng" title="Tắt tiếng"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4zm12-1 5 6m0-6-5 6"/></svg></button><input id="floatingVolume" type="range" min="0" max="1" step="0.01" value="0.75" aria-label="Điều chỉnh âm lượng"><span id="floatingVolumeValue">75%</span></div>
     <div class="floating-status" id="floatingStatus" aria-live="polite">Đang thử phát nhạc…</div>
   </aside>
 
@@ -67,14 +67,14 @@
       <p class="section-copy">Hai bức ảnh, hai cái tên, và một ngày đặc biệt để nhớ.</p>
       <div class="couple-grid">
         <article class="portrait-card portrait-left">
-          <div class="photo-pin">✳</div>
+          <div class="photo-pin" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8m0-12.8L5.6 18.4"/></svg></div>
           <div class="photo-frame"><img src="assets/images/huy-tran.jpeg" alt="Huy Tran ôm bó hoa hồng" loading="eager"></div>
           <div class="portrait-caption"><span class="caption-small">THE BOY</span><h3>Huy Tran</h3><p>Người gửi những lời thương ♡</p></div>
           <span class="hand-note note-left">that's me!</span>
         </article>
         <div class="between-heart" aria-hidden="true">♡<span>♡</span></div>
         <article class="portrait-card portrait-right">
-          <div class="photo-pin">✿</div>
+          <div class="photo-pin" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5c1.4 3 2.5 4.1 5.5 5.5-3 1.4-4.1 2.5-5.5 5.5-1.4-3-2.5-4.1-5.5-5.5 3-1.4 4.1-2.5 5.5-5.5Z"/><path d="M12 14.5v6"/></svg></div>
           <div class="photo-frame"><img src="assets/images/thuy-linh.jpeg" alt="Thuỳ Linh ôm bó hoa hồng" loading="eager"></div>
           <div class="portrait-caption"><span class="caption-small">THE GIRL</span><h3>Thuỳ Linh</h3><p>Thúi iuuu của anh ♡</p></div>
           <span class="hand-note note-right">my favorite</span>
@@ -116,7 +116,7 @@
       <div class="section-label">04 / OUR LITTLE SOUNDTRACK</div>
       <h2>Một bài hát,<br><em>một góc của chúng mình.</em></h2>
       <div class="music-player">
-        <div class="vinyl-area"><div class="vinyl" id="vinyl"><div class="vinyl-label">H <span>♡</span> L</div></div><div class="vinyl-shadow"></div></div>
+        <div class="vinyl-area"><div class="vinyl" id="vinyl"><div class="vinyl-label"><span>H</span><span class="vinyl-heart">♡</span><span>L</span></div></div><div class="vinyl-shadow"></div></div>
         <div class="track-info"><span class="caption-small">NOW PLAYING</span><h3>Từ thích thích thành thương thương</h3><p>AMEE & Hoàng Dũng</p>
           <audio id="audio" preload="auto" autoplay playsinline>
             <source src="assets/music/our-song.mp3" type="audio/mpeg">

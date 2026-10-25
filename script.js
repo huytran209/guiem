@@ -64,7 +64,7 @@
   const audio = $('audio'), playButton = $('playButton'), vinyl = $('vinyl');
   const progress = $('progress'), volume = $('volume');
   const currentTime = $('currentTime'), duration = $('duration'), audioStatus = $('audioStatus');
-  const floatingPlay = $('floatingPlay'), floatingVolume = $('floatingVolume'), floatingMute = $('floatingMute');
+  const floatingPlay = $('floatingPlay'), floatingVolume = $('floatingVolume'), floatingMute = $('floatingMute'), floatingResize = $('floatingResize');
   const floatingVolumeValue = $('floatingVolumeValue'), floatingStatus = $('floatingStatus');
   audio.volume = Number(volume.value);
   let previousVolume = audio.volume || 0.75;
@@ -74,11 +74,11 @@
   }
   function syncPlayState() {
     const playing = !audio.paused;
-    playButton.textContent = playing ? 'Ⅱ' : '▶';
+    playButton.innerHTML = playing ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM15 5h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>'; 
     playButton.setAttribute('aria-label', playing ? 'Tạm dừng nhạc' : 'Phát nhạc');
     vinyl.classList.toggle('playing', playing);
     musicMini.innerHTML = playing ? 'Ⅱ <span>Music</span>' : '♫ <span>Music</span>';
-    floatingPlay.textContent = playing ? 'Ⅱ' : '▶';
+    floatingPlay.innerHTML = playing ? '<svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM15 5h4v14h-4z"/></svg>' : '<svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
     floatingPlay.setAttribute('aria-label', playing ? 'Tạm dừng nhạc' : 'Phát nhạc');
     floatingStatus.textContent = playing ? 'Đang phát nhạc ♡' : (audio.error ? 'Không tải được nhạc' : 'Nhạc đang tạm dừng');
   }
@@ -97,20 +97,37 @@
   playButton.addEventListener('click', toggleAudio);
   musicMini.addEventListener('click', toggleAudio);
   floatingPlay.addEventListener('click', toggleAudio);
+  if (floatingResize) floatingResize.addEventListener('click', () => {
+    const player = document.getElementById('floatingMusic');
+    const sizes = ['size-small', 'size-normal', 'size-large'];
+    const current = sizes.findIndex((name) => player.classList.contains(name));
+    sizes.forEach((name) => player.classList.remove(name));
+    player.classList.remove('is-compact');
+    const next = (current + 1) % sizes.length;
+    player.classList.add(sizes[next]);
+    const labels = ['Kích thước nhỏ; nhấn để đổi kích thước', 'Kích thước vừa; nhấn để đổi kích thước', 'Kích thước lớn; nhấn để đổi kích thước'];
+    floatingResize.setAttribute('aria-label', labels[next]);
+    floatingResize.title = labels[next];
+  });
   audio.addEventListener('play', syncPlayState);
   audio.addEventListener('pause', syncPlayState);
-  audio.addEventListener('loadedmetadata', () => {
-    duration.textContent = formatTime(audio.duration);
-    progress.max = Number.isFinite(audio.duration) ? audio.duration : 100;
-  });
+  function syncDuration() {
+    if (Number.isFinite(audio.duration) && audio.duration > 0) {
+      duration.textContent = formatTime(audio.duration);
+      progress.max = audio.duration;
+    } else { duration.textContent = '0:00'; }
+  }
+  audio.addEventListener('loadedmetadata', syncDuration);
+  audio.addEventListener('durationchange', syncDuration);
+  audio.addEventListener('canplay', syncDuration);
   audio.addEventListener('timeupdate', () => {
     currentTime.textContent = formatTime(audio.currentTime);
-    if (Number.isFinite(audio.duration) && audio.duration > 0) progress.value = audio.currentTime;
+    if (Number.isFinite(audio.duration) && audio.duration > 0) { duration.textContent = formatTime(audio.duration); progress.max = audio.duration; progress.value = audio.currentTime; }
   });
   progress.addEventListener('input', () => { if (Number.isFinite(audio.duration)) audio.currentTime = Number(progress.value); });
-  volume.addEventListener('input', () => { audio.volume = Number(volume.value); floatingVolume.value = volume.value; floatingVolumeValue.textContent = Math.round(audio.volume * 100) + '%'; if (audio.volume > 0) { previousVolume = audio.volume; floatingMute.textContent = '♫'; floatingMute.setAttribute('aria-label','Tắt tiếng'); } });
-  floatingVolume.addEventListener('input', () => { audio.volume = Number(floatingVolume.value); volume.value = floatingVolume.value; floatingVolumeValue.textContent = Math.round(audio.volume * 100) + '%'; if (audio.volume > 0) previousVolume = audio.volume; floatingMute.textContent = audio.volume === 0 ? '×' : '♫'; floatingMute.setAttribute('aria-label', audio.volume === 0 ? 'Bật tiếng' : 'Tắt tiếng'); });
-  floatingMute.addEventListener('click', () => { if (audio.volume > 0) { previousVolume = audio.volume; audio.volume = 0; } else { audio.volume = previousVolume || 0.75; } volume.value = floatingVolume.value = String(audio.volume); floatingVolumeValue.textContent = Math.round(audio.volume * 100) + '%'; floatingMute.textContent = audio.volume === 0 ? '×' : '♫'; floatingMute.setAttribute('aria-label', audio.volume === 0 ? 'Bật tiếng' : 'Tắt tiếng'); });
+  volume.addEventListener('input', () => { audio.volume = Number(volume.value); floatingVolume.value = volume.value; floatingVolumeValue.textContent = Math.round(audio.volume * 100) + '%'; if (audio.volume > 0) { previousVolume = audio.volume; floatingMute.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4z"/></svg>'; floatingMute.setAttribute('aria-label','Tắt tiếng'); } });
+  floatingVolume.addEventListener('input', () => { audio.volume = Number(floatingVolume.value); volume.value = floatingVolume.value; floatingVolumeValue.textContent = Math.round(audio.volume * 100) + '%'; if (audio.volume > 0) previousVolume = audio.volume; floatingMute.innerHTML = audio.volume === 0 ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4zm12 0 5 5m0-5-5 5"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4z"/></svg>'; floatingMute.setAttribute('aria-label', audio.volume === 0 ? 'Bật tiếng' : 'Tắt tiếng'); });
+  floatingMute.addEventListener('click', () => { if (audio.volume > 0) { previousVolume = audio.volume; audio.volume = 0; } else { audio.volume = previousVolume || 0.75; } volume.value = floatingVolume.value = String(audio.volume); floatingVolumeValue.textContent = Math.round(audio.volume * 100) + '%'; floatingMute.innerHTML = audio.volume === 0 ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4zm12 0 5 5m0-5-5 5"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4z"/></svg>'; floatingMute.setAttribute('aria-label', audio.volume === 0 ? 'Bật tiếng' : 'Tắt tiếng'); });
   // Try audible autoplay on first load. Browsers may reject it until a user gesture.
   window.addEventListener('load', () => { audio.play().then(() => { floatingStatus.textContent = 'Đang phát nhạc ♡'; }).catch(() => { floatingStatus.textContent = 'Chạm ▶ để bắt đầu phát nhạc'; }); }, { once: true });
   audio.addEventListener('error', () => {

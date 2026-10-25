@@ -34,3 +34,12 @@ Nên mở qua máy chủ tĩnh cục bộ để kiểm tra đường dẫn tài 
 - Google Fonts cần kết nối Internet; nếu ngoại tuyến, website dùng font dự phòng.
 - Nếu tài nguyên không tải trên GitHub Pages, kiểm tra đúng chữ hoa/thường và đảm bảo đã tải cả thư mục `assets`.
 - Đây là website tĩnh; không có hệ thống đăng nhập hoặc bảo vệ nội dung bằng mật khẩu.
+
+
+## Lưu ý triển khai để tránh lỗi ảnh/nhạc
+
+1. Giải nén ZIP trên máy tính trước khi tải lên GitHub.
+2. Đưa `index.html`, `style.css`, `script.js` và thư mục `assets` vào cùng thư mục gốc của repository (không tải nguyên file ZIP lên, không để các file nằm thêm một cấp thư mục).
+3. Kiểm tra tên file đúng chữ hoa/chữ thường: `assets/images/huy-tran.jpeg`, `assets/images/thuy-linh.jpeg`, `assets/music/our-song.mp3`.
+4. Sau khi GitHub Pages triển khai xong, mở trang, nhấn “Mở cuốn nhật ký”, rồi nhấn nút phát nhạc.
+5. Nếu dùng `index-single-standalone.html`, đổi tên thành `index.html` trước khi đặt vào thư mục gốc. Bản standalone nhúng ảnh và nhạc bên trong HTML nên không phụ thuộc thư mục `assets`; dung lượng lớn hơn đáng kể.

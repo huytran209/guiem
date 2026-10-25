@@ -1,0 +1,153 @@
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const toast = $('toast');
+  let toastTimer;
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+  }
+  const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scrollToElement = (element) => element.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+
+  // Initial state: only the diary cover is visible.
+  const diaryContent = $('diaryContent');
+  const topbarNav = document.querySelector('.topbar nav');
+  const musicMini = $('musicMini');
+  document.body.classList.add('cover-only');
+  if (diaryContent) diaryContent.hidden = true;
+  if (topbarNav) topbarNav.setAttribute('aria-hidden', 'true');
+  if (musicMini) musicMini.setAttribute('aria-hidden', 'true');
+
+  $('openBook').addEventListener('click', () => {
+    document.body.classList.remove('cover-only');
+    document.body.classList.add('opening-diary');
+    if (topbarNav) topbarNav.removeAttribute('aria-hidden');
+    if (musicMini) musicMini.removeAttribute('aria-hidden');
+    diaryContent.hidden = false;
+    requestAnimationFrame(() => diaryContent.classList.add('diary-open'));
+    setTimeout(() => {
+      document.body.classList.remove('opening-diary');
+      scrollToElement($('time'));
+    }, reducedMotion() ? 0 : 500);
+  });
+
+  $('backCover').addEventListener('click', () => {
+    diaryContent.classList.remove('diary-open');
+    diaryContent.hidden = true;
+    document.body.classList.remove('opening-diary');
+    document.body.classList.add('cover-only');
+    if (topbarNav) topbarNav.setAttribute('aria-hidden', 'true');
+    if (musicMini) musicMini.setAttribute('aria-hidden', 'true');
+    window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
+  });
+
+  $('backTop').addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
+  });
+
+  // Calendar-aware elapsed time from the relationship start date (Vietnam time).
+  function updateCounter() {
+    const start = new Date('2026-04-30T00:00:00+07:00').getTime();
+    const elapsed = Math.max(0, Date.now() - start);
+    const day = 86400000, hour = 3600000, minute = 60000;
+    $('days').textContent = Math.floor(elapsed / day).toLocaleString('vi-VN');
+    $('hours').textContent = String(Math.floor((elapsed % day) / hour)).padStart(2, '0');
+    $('minutes').textContent = String(Math.floor((elapsed % hour) / minute)).padStart(2, '0');
+    $('seconds').textContent = String(Math.floor((elapsed % minute) / 1000)).padStart(2, '0');
+  }
+  updateCounter();
+  setInterval(updateCounter, 1000);
+
+  // Music player.
+  const audio = $('audio'), playButton = $('playButton'), vinyl = $('vinyl');
+  const progress = $('progress'), volume = $('volume');
+  const currentTime = $('currentTime'), duration = $('duration'), audioStatus = $('audioStatus');
+  audio.volume = Number(volume.value);
+  function formatTime(seconds) {
+    if (!Number.isFinite(seconds)) return '0:00';
+    return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
+  }
+  function syncPlayState() {
+    const playing = !audio.paused;
+    playButton.textContent = playing ? 'Ⅱ' : '▶';
+    playButton.setAttribute('aria-label', playing ? 'Tạm dừng nhạc' : 'Phát nhạc');
+    vinyl.classList.toggle('playing', playing);
+    musicMini.innerHTML = playing ? 'Ⅱ <span>Music</span>' : '♫ <span>Music</span>';
+  }
+  async function toggleAudio() {
+    if (!audio.paused) { audio.pause(); return; }
+    try {
+      await audio.play();
+      audioStatus.textContent = 'Đang phát: Từ thích thích thành thương thương';
+    } catch (err) {
+      audioStatus.textContent = 'Chưa phát được nhạc. Hãy kiểm tra kết nối, đường dẫn file MP3 hoặc thử tải lại trang.';
+      showToast('Chưa phát được nhạc. Kiểm tra file MP3 và thử lại.');
+    }
+  }
+  playButton.addEventListener('click', toggleAudio);
+  musicMini.addEventListener('click', toggleAudio);
+  audio.addEventListener('play', syncPlayState);
+  audio.addEventListener('pause', syncPlayState);
+  audio.addEventListener('loadedmetadata', () => {
+    duration.textContent = formatTime(audio.duration);
+    progress.max = Number.isFinite(audio.duration) ? audio.duration : 100;
+  });
+  audio.addEventListener('timeupdate', () => {
+    currentTime.textContent = formatTime(audio.currentTime);
+    if (Number.isFinite(audio.duration) && audio.duration > 0) progress.value = audio.currentTime;
+  });
+  progress.addEventListener('input', () => { if (Number.isFinite(audio.duration)) audio.currentTime = Number(progress.value); });
+  volume.addEventListener('input', () => { audio.volume = Number(volume.value); });
+  audio.addEventListener('error', () => {
+    audioStatus.textContent = 'Không tải được nhạc. Kiểm tra assets/music/our-song.mp3 và file dự phòng M4A.';
+  });
+
+  // Six messages are selected uniformly at random; repeats are intentionally allowed.
+  const notes = [
+    'Cứ quấn lấy anh đi. Anh không cần khoảng cách, anh chỉ cần em.',
+    'Nhắn cho anh mỗi khi em nhớ anh, dù là cứ năm phút một lần cũng được.',
+    'Kể anh nghe về một ngày của em đi, những chuyện nhỏ nhặt, cả những chuyện chẳng có gì đặc biệt. Anh muốn biết tất cả.',
+    'Anh không bao giờ thấy chán em. Anh yêu cách em cứ luôn ở thật gần anh.',
+    'Anh tự hào về em mỗi ngày, bởi vì em là một trong những người mạnh mẽ nhất mà anh từng biết, với một trái tim đẹp đẽ nhất.',
+    'Anh sẽ luôn ở đây bên em, nhưng nếu có lúc em không ổn, xin hãy nói với anh nhé.'
+  ];
+  const noteCard = $('randomNoteCard');
+  let lastNoteIndex = -1;
+  $('drawNote').addEventListener('click', () => {
+    let index = Math.floor(Math.random() * notes.length);
+    // Randomness is retained while avoiding an identical immediate repeat when possible.
+    if (notes.length > 1 && index === lastNoteIndex) index = (index + 1 + Math.floor(Math.random() * (notes.length - 1))) % notes.length;
+    lastNoteIndex = index;
+    noteCard.classList.add('note-changing');
+    setTimeout(() => {
+      $('randomNoteText').textContent = notes[index];
+      $('randomNoteNumber').textContent = `♡ / ${String(index + 1).padStart(2, '0')}`;
+      noteCard.classList.remove('note-changing');
+    }, reducedMotion() ? 0 : 180);
+  });
+
+  $('revealFinal').addEventListener('click', () => {
+    const finalMessage = $('finalMessage');
+    const willShow = finalMessage.hidden;
+    finalMessage.hidden = !willShow;
+    $('revealFinal').textContent = willShow ? 'Ẩn lời cuối cùng' : 'Mở lời cuối cùng của anh ♡';
+    if (willShow) {
+      setTimeout(() => scrollToElement(finalMessage), reducedMotion() ? 0 : 80);
+    }
+  });
+
+  // Smoothly reveal sections as they enter view, when supported.
+  if ('IntersectionObserver' in window && !reducedMotion()) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.section').forEach((section) => observer.observe(section));
+  }
+})();

@@ -11,6 +11,14 @@
 </head>
 <body>
   <div class="paper-grain" aria-hidden="true"></div>
+  <aside class="floating-music" id="floatingMusic" aria-label="Trình phát nhạc" role="region">
+    <div class="floating-music-top"><span class="floating-kicker">OUR LITTLE SONG ♡</span><button type="button" id="floatingPlay" class="floating-play" aria-label="Phát nhạc">▶</button></div>
+    <div class="floating-track">Từ thích thích thành thương thương</div>
+    <div class="floating-artist">AMEE &amp; Hoàng Dũng</div>
+    <div class="floating-volume"><button type="button" id="floatingMute" class="floating-mute" aria-label="Tắt tiếng" title="Tắt tiếng">♫</button><input id="floatingVolume" type="range" min="0" max="1" step="0.01" value="0.75" aria-label="Điều chỉnh âm lượng"><span id="floatingVolumeValue">75%</span></div>
+    <div class="floating-status" id="floatingStatus" aria-live="polite">Đang thử phát nhạc…</div>
+  </aside>
+
   <header class="topbar">
     <a class="wordmark" href="#home" aria-label="Về đầu trang">H <span>♡</span> L</a>
     <nav aria-label="Điều hướng chính">
@@ -110,7 +118,7 @@
       <div class="music-player">
         <div class="vinyl-area"><div class="vinyl" id="vinyl"><div class="vinyl-label">H <span>♡</span> L</div></div><div class="vinyl-shadow"></div></div>
         <div class="track-info"><span class="caption-small">NOW PLAYING</span><h3>Từ thích thích thành thương thương</h3><p>AMEE & Hoàng Dũng</p>
-          <audio id="audio" preload="metadata">
+          <audio id="audio" preload="auto" autoplay playsinline>
             <source src="assets/music/our-song.mp3" type="audio/mpeg">
             <source src="assets/music/our-song.m4a" type="audio/mp4">
             Trình duyệt của bạn không hỗ trợ phát âm thanh HTML5.

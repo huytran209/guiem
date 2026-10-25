@@ -64,7 +64,10 @@
   const audio = $('audio'), playButton = $('playButton'), vinyl = $('vinyl');
   const progress = $('progress'), volume = $('volume');
   const currentTime = $('currentTime'), duration = $('duration'), audioStatus = $('audioStatus');
+  const floatingPlay = $('floatingPlay'), floatingVolume = $('floatingVolume'), floatingMute = $('floatingMute');
+  const floatingVolumeValue = $('floatingVolumeValue'), floatingStatus = $('floatingStatus');
   audio.volume = Number(volume.value);
+  let previousVolume = audio.volume || 0.75;
   function formatTime(seconds) {
     if (!Number.isFinite(seconds)) return '0:00';
     return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -75,19 +78,25 @@
     playButton.setAttribute('aria-label', playing ? 'Tạm dừng nhạc' : 'Phát nhạc');
     vinyl.classList.toggle('playing', playing);
     musicMini.innerHTML = playing ? 'Ⅱ <span>Music</span>' : '♫ <span>Music</span>';
+    floatingPlay.textContent = playing ? 'Ⅱ' : '▶';
+    floatingPlay.setAttribute('aria-label', playing ? 'Tạm dừng nhạc' : 'Phát nhạc');
+    floatingStatus.textContent = playing ? 'Đang phát nhạc ♡' : (audio.error ? 'Không tải được nhạc' : 'Nhạc đang tạm dừng');
   }
   async function toggleAudio() {
     if (!audio.paused) { audio.pause(); return; }
     try {
       await audio.play();
       audioStatus.textContent = 'Đang phát: Từ thích thích thành thương thương';
+      floatingStatus.textContent = 'Đang phát nhạc ♡';
     } catch (err) {
       audioStatus.textContent = 'Chưa phát được nhạc. Hãy kiểm tra kết nối, đường dẫn file MP3 hoặc thử tải lại trang.';
-      showToast('Chưa phát được nhạc. Kiểm tra file MP3 và thử lại.');
+      floatingStatus.textContent = 'Trình duyệt chặn tự phát — chạm ▶ để nghe';
+      showToast('Trình duyệt có thể chặn tự phát. Hãy chạm nút ▶ để nghe nhạc.');
     }
   }
   playButton.addEventListener('click', toggleAudio);
   musicMini.addEventListener('click', toggleAudio);
+  floatingPlay.addEventListener('click', toggleAudio);
   audio.addEventListener('play', syncPlayState);
   audio.addEventListener('pause', syncPlayState);
   audio.addEventListener('loadedmetadata', () => {
@@ -99,9 +108,14 @@
     if (Number.isFinite(audio.duration) && audio.duration > 0) progress.value = audio.currentTime;
   });
   progress.addEventListener('input', () => { if (Number.isFinite(audio.duration)) audio.currentTime = Number(progress.value); });
-  volume.addEventListener('input', () => { audio.volume = Number(volume.value); });
+  volume.addEventListener('input', () => { audio.volume = Number(volume.value); floatingVolume.value = volume.value; floatingVolumeValue.textContent = Math.round(audio.volume * 100) + '%'; if (audio.volume > 0) { previousVolume = audio.volume; floatingMute.textContent = '♫'; floatingMute.setAttribute('aria-label','Tắt tiếng'); } });
+  floatingVolume.addEventListener('input', () => { audio.volume = Number(floatingVolume.value); volume.value = floatingVolume.value; floatingVolumeValue.textContent = Math.round(audio.volume * 100) + '%'; if (audio.volume > 0) previousVolume = audio.volume; floatingMute.textContent = audio.volume === 0 ? '×' : '♫'; floatingMute.setAttribute('aria-label', audio.volume === 0 ? 'Bật tiếng' : 'Tắt tiếng'); });
+  floatingMute.addEventListener('click', () => { if (audio.volume > 0) { previousVolume = audio.volume; audio.volume = 0; } else { audio.volume = previousVolume || 0.75; } volume.value = floatingVolume.value = String(audio.volume); floatingVolumeValue.textContent = Math.round(audio.volume * 100) + '%'; floatingMute.textContent = audio.volume === 0 ? '×' : '♫'; floatingMute.setAttribute('aria-label', audio.volume === 0 ? 'Bật tiếng' : 'Tắt tiếng'); });
+  // Try audible autoplay on first load. Browsers may reject it until a user gesture.
+  window.addEventListener('load', () => { audio.play().then(() => { floatingStatus.textContent = 'Đang phát nhạc ♡'; }).catch(() => { floatingStatus.textContent = 'Chạm ▶ để bắt đầu phát nhạc'; }); }, { once: true });
   audio.addEventListener('error', () => {
     audioStatus.textContent = 'Không tải được nhạc. Kiểm tra assets/music/our-song.mp3 và file dự phòng M4A.';
+    floatingStatus.textContent = 'Không tải được nhạc — kiểm tra đường dẫn file';
   });
 
   // Six messages are selected uniformly at random; repeats are intentionally allowed.
